@@ -24,13 +24,17 @@ export const useAuthStore = create<AuthState>((set) => {
   const getStoredUser = () => {
     if (typeof window === 'undefined') return null;
     const stored = localStorage.getItem('factlens_user');
-    return stored ? JSON.parse(stored) : {
+    const user = stored ? JSON.parse(stored) : {
       id: 'usr_1',
       name: 'Alex Mercer',
       email: 'alex.mercer@academy.edu',
       role: 'Student',
       onboarded: true
     };
+    if (user) {
+      document.cookie = `factlens_user_session=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=604800; SameSite=Lax`;
+    }
+    return user;
   };
 
   return {
@@ -48,6 +52,7 @@ export const useAuthStore = create<AuthState>((set) => {
         onboarded: true
       };
       localStorage.setItem('factlens_user', JSON.stringify(user));
+      document.cookie = `factlens_user_session=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=604800; SameSite=Lax`;
       set({ user, isAuthenticated: true, isLoading: false });
     },
     register: async (name, email) => {
@@ -61,22 +66,26 @@ export const useAuthStore = create<AuthState>((set) => {
         onboarded: false
       };
       localStorage.setItem('factlens_user', JSON.stringify(user));
+      document.cookie = `factlens_user_session=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=604800; SameSite=Lax`;
       set({ user, isAuthenticated: true, isLoading: false });
     },
     logout: () => {
       localStorage.removeItem('factlens_user');
+      document.cookie = 'factlens_user_session=; path=/; max-age=0; SameSite=Lax';
       set({ user: null, isAuthenticated: false });
     },
     toggleRole: () => set((state) => {
       if (!state.user) return {};
       const newUser = { ...state.user, role: state.user.role === 'Student' ? 'Admin' : ('Student' as const) };
       localStorage.setItem('factlens_user', JSON.stringify(newUser));
+      document.cookie = `factlens_user_session=${encodeURIComponent(JSON.stringify(newUser))}; path=/; max-age=604800; SameSite=Lax`;
       return { user: newUser };
     }),
     setOnboarded: (val) => set((state) => {
       if (!state.user) return {};
       const newUser = { ...state.user, onboarded: val };
       localStorage.setItem('factlens_user', JSON.stringify(newUser));
+      document.cookie = `factlens_user_session=${encodeURIComponent(JSON.stringify(newUser))}; path=/; max-age=604800; SameSite=Lax`;
       return { user: newUser };
     })
   };

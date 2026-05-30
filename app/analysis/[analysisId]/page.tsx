@@ -9,19 +9,20 @@ import ChatPanel from '@/components/analysis/chat-panel';
 import StudyMode from '@/components/analysis/study-mode';
 import AgentConsole from '@/components/analysis/agent-console';
 import EvidenceCard from '@/components/analysis/evidence-card';
-import SourceCard from '@/components/analysis/source-card';
 import GraphView from '@/components/graph/graph-view';
 import NodeCard from '@/components/graph/node-card';
 import ReportSharing from '@/components/reports/report-sharing';
 import Breadcrumbs from '@/components/shared/breadcrumbs';
+import EvidenceExplorer from '@/components/analysis/evidence-explorer';
+import ResearchMode from '@/components/analysis/research-mode';
 import { jsPDF } from 'jspdf';
-import { BookOpen, Star, FileText, Scale, Eye, Activity, Sparkles } from 'lucide-react';
+import { BookOpen, Star, FileText, Activity } from 'lucide-react';
 
 export default function AnalysisDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { records, toggleBookmark } = useAnalysisStore();
-  const [activeTab, setActiveTab] = useState<'claims' | 'bias' | 'study' | 'agents' | 'graph'>('claims');
+  const [activeTab, setActiveTab] = useState<'claims' | 'evidence' | 'research' | 'study' | 'agents' | 'bias' | 'graph'>('claims');
   const [selectedNode, setSelectedNode] = useState<{ label: string; type: string; description: string } | null>(null);
 
   const id = params.analysisId as string;
@@ -31,7 +32,7 @@ export default function AnalysisDetailPage() {
     return (
       <div className="text-center py-20 text-slate-400 text-xs select-none max-w-md mx-auto">
         Report could not be found. Let's redirect to your workspace.
-        <button onClick={() => router.push('/dashboard')} className="mt-4 block w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-colors">
+        <button onClick={() => router.push('/dashboard')} className="mt-4 block w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-colors cursor-pointer">
           Return to Dashboard
         </button>
       </div>
@@ -42,18 +43,21 @@ export default function AnalysisDetailPage() {
     const doc = new jsPDF();
     doc.setFont('Helvetica', 'normal');
     doc.text('FactLens Fact-Check Portfolio', 14, 25);
+    doc.text(`Title: ${record.title}`, 14, 35);
+    doc.text(`Trust Rating: ${record.trustRating}`, 14, 45);
+    doc.text(`Credibility Score: ${record.credibilityScore}%`, 14, 55);
     doc.save(`FactLens_Report_${record.id}.pdf`);
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-12 select-none">
+    <div className="max-w-7xl mx-auto pb-12 select-none px-6">
       <Breadcrumbs items={[{ name: 'History Logs', href: '/dashboard/history' }, { name: 'Report detail' }]} />
       
       <div className="space-y-8">
         
         {/* Header Title */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-white/10 pb-6">
-          <div className="space-y-1.5 max-w-3xl">
+          <div className="space-y-1.5 max-w-3xl text-left">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400 bg-cyan-950/40 border border-cyan-500/20 px-2 py-0.5 rounded animate-pulse">
                 Verified: {record.trustRating} Trust
@@ -101,7 +105,7 @@ export default function AnalysisDetailPage() {
               </div>
 
               {/* Reading Difficulty Panel */}
-              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between h-full min-h-[180px]">
+              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between h-full min-h-[180px] text-left">
                 <div className="space-y-1.5">
                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <BookOpen className="h-3.5 w-3.5" /> Reading Difficulty
@@ -118,7 +122,7 @@ export default function AnalysisDetailPage() {
               </div>
 
               {/* Credibility Dimensions Radar chart mock */}
-              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between h-full min-h-[180px]">
+              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between h-full min-h-[180px] text-left">
                 <div className="space-y-1.5">
                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <Activity className="h-3.5 w-3.5" /> Radar Dimensions
@@ -170,7 +174,23 @@ export default function AnalysisDetailPage() {
                 activeTab === 'claims' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
               }`}
             >
-              Verification Claims ({record.claims.length})
+              Verification Claims
+            </button>
+            <button 
+              onClick={() => setActiveTab('evidence')}
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
+                activeTab === 'evidence' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Evidence Explorer
+            </button>
+            <button 
+              onClick={() => setActiveTab('research')}
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
+                activeTab === 'research' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Research & Citations
             </button>
             <button 
               onClick={() => setActiveTab('study')}
@@ -209,17 +229,17 @@ export default function AnalysisDetailPage() {
           <div className="mt-4">
             
             {activeTab === 'claims' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
-                  <EvidenceCard claims={record.claims} />
-                </div>
-                <div className="space-y-6">
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Suggested Consensus Libraries</h4>
-                  </div>
-                  <SourceCard sources={record.suggestedSources} />
-                </div>
+              <div className="space-y-4 max-w-4xl mx-auto text-left">
+                <EvidenceCard claims={record.claims} />
               </div>
+            )}
+
+            {activeTab === 'evidence' && (
+              <EvidenceExplorer sources={record.suggestedSources} />
+            )}
+
+            {activeTab === 'research' && (
+              <ResearchMode articleTitle={record.title} sourceUrl={`https://factlens.ai/report/${record.id}`} />
             )}
 
             {activeTab === 'study' && (
@@ -231,7 +251,7 @@ export default function AnalysisDetailPage() {
             )}
 
             {activeTab === 'bias' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
                 {Object.entries(record.bias).filter(([k]) => k !== 'explanation').map(([key, val]) => (
                   <div key={key} className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 space-y-3.5">
                     <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -252,7 +272,7 @@ export default function AnalysisDetailPage() {
             )}
 
             {activeTab === 'graph' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left">
                 <div className="lg:col-span-2">
                   <GraphView 
                     articleTitle={record.title} 

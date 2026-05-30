@@ -6,7 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { useNotificationStore } from '@/store/notification.store';
 import GlobalSearch from './global-search';
-import { Bell, ShieldAlert, Sparkles, User as UserIcon, LogOut, CheckCircle, GraduationCap, Scale } from 'lucide-react';
+import { Bell, ShieldAlert, Sparkles, User as UserIcon, LogOut, CheckCircle, GraduationCap, Scale, Menu } from 'lucide-react';
+import { useUiStore } from '@/store/ui.store';
 
 export default function Navbar() {
   const { user, logout, toggleRole } = useAuthStore();
@@ -15,6 +16,7 @@ export default function Navbar() {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
+  const { toggleSidebar } = useUiStore();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -22,8 +24,19 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-slate-950/80 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between px-6">
         
+        {/* Toggle Button for Mobile Sidebar */}
+        {user && (
+          <button
+            onClick={toggleSidebar}
+            className="p-2 mr-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all md:hidden shrink-0 cursor-pointer"
+            title="Toggle Menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2 group mr-auto md:mr-0">
           <div className="rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-500 p-2 shadow-md shadow-violet-500/20 group-hover:scale-105 transition-transform duration-300">
             <ShieldAlert className="h-5 w-5 text-white" />
           </div>
