@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAnalysisStore } from '@/store/analysis.store';
 import { analyzeContent } from '@/services/ai/analysis.service';
 import Breadcrumbs from '@/components/shared/breadcrumbs';
-import { Play, Upload, Loader, FileText } from 'lucide-react';
+import PipelineAnimator from '@/components/analysis/pipeline-animator';
+import { Play, Upload, FileText } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function UploadAnalysisPage() {
@@ -13,45 +14,32 @@ export default function UploadAnalysisPage() {
   const { addRecord, activeApiKey } = useAnalysisStore();
   const [fileName, setFileName] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
-  const [logStep, setLogStep] = useState('');
 
   const handleRun = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fileName) return;
     setAnalyzing(true);
 
-    const steps = [
-      'Extracting PDF text structures...',
-      'Filtering footnotes and bibliographies...',
-      'Mapping isolated claim clusters...',
-      'Consulting government registries...',
-      'Synthesizing bias distributions...',
-      'Publishing evaluation report...'
-    ];
+    setTimeout(async () => {
+      try {
+        const record = await analyzeContent({
+          type: 'upload',
+          data: `Uploaded research document file named: ${fileName}. Content contains assertions regarding Kepler and space habitable variables.`,
+          title: fileName
+        }, activeApiKey);
 
-    for (let i = 0; i < steps.length; i++) {
-      setLogStep(steps[i]);
-      await new Promise(r => setTimeout(r, 600));
-    }
-
-    try {
-      const record = await analyzeContent({
-        type: 'upload',
-        data: `Uploaded research document file named: ${fileName}. Content contains assertions regarding Kepler and space habitable variables.`,
-        title: fileName
-      }, activeApiKey);
-
-      addRecord(record);
-      confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
-      router.push(`/analysis/${record.id}`);
-    } catch (e) {
-      console.error(e);
-      setAnalyzing(false);
-    }
+        addRecord(record);
+        confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
+        router.push(`/analysis/${record.id}`);
+      } catch (e) {
+        console.error(e);
+        setAnalyzing(false);
+      }
+    }, 6600);
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-12">
+    <div className="max-w-7xl mx-auto pb-12 select-none">
       <Breadcrumbs items={[{ name: 'Analyze Content', href: '/analysis' }, { name: 'PDF/DOCX Upload' }]} />
       
       <div className="space-y-6 max-w-2xl">
@@ -61,13 +49,7 @@ export default function UploadAnalysisPage() {
         </div>
 
         {analyzing ? (
-          <div className="border border-white/10 rounded-2xl bg-slate-900/60 p-12 text-center flex flex-col items-center justify-center space-y-6">
-            <Loader className="h-10 w-10 text-cyan-400 animate-spin" />
-            <div className="space-y-1.5">
-              <h3 className="text-sm font-bold text-slate-200">FactLens Processing PDF Payload</h3>
-              <p className="text-xs text-slate-500 font-mono tracking-tight animate-pulse">{logStep}</p>
-            </div>
-          </div>
+          <PipelineAnimator />
         ) : (
           <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md space-y-6">
             

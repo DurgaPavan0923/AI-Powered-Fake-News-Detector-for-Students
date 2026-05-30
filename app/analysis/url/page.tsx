@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAnalysisStore } from '@/store/analysis.store';
 import { analyzeContent } from '@/services/ai/analysis.service';
 import Breadcrumbs from '@/components/shared/breadcrumbs';
-import { Play, Link as LinkIcon, Loader } from 'lucide-react';
+import PipelineAnimator from '@/components/analysis/pipeline-animator';
+import { Play, Link as LinkIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function UrlAnalysisPage() {
@@ -13,44 +14,31 @@ export default function UrlAnalysisPage() {
   const { addRecord, activeApiKey } = useAnalysisStore();
   const [urlInput, setUrlInput] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
-  const [logStep, setLogStep] = useState('');
 
   const handleRun = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!urlInput) return;
     setAnalyzing(true);
 
-    const steps = [
-      'Scraping target domain parameters...',
-      'Sanitizing parsed DOM text layers...',
-      'Identifying source author metadata...',
-      'Invoking RAG claim-comparison vectors...',
-      'Computing bias emotional markers...',
-      'Formulating final report payload...'
-    ];
+    setTimeout(async () => {
+      try {
+        const record = await analyzeContent({
+          type: 'url',
+          data: urlInput
+        }, activeApiKey);
 
-    for (let i = 0; i < steps.length; i++) {
-      setLogStep(steps[i]);
-      await new Promise(r => setTimeout(r, 600));
-    }
-
-    try {
-      const record = await analyzeContent({
-        type: 'url',
-        data: urlInput
-      }, activeApiKey);
-
-      addRecord(record);
-      confetti({ particleCount: 100, spread: 65, origin: { y: 0.7 } });
-      router.push(`/analysis/${record.id}`);
-    } catch (e) {
-      console.error(e);
-      setAnalyzing(false);
-    }
+        addRecord(record);
+        confetti({ particleCount: 100, spread: 65, origin: { y: 0.7 } });
+        router.push(`/analysis/${record.id}`);
+      } catch (e) {
+        console.error(e);
+        setAnalyzing(false);
+      }
+    }, 6600);
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-12">
+    <div className="max-w-7xl mx-auto pb-12 select-none">
       <Breadcrumbs items={[{ name: 'Analyze Content', href: '/analysis' }, { name: 'URL Link' }]} />
       
       <div className="space-y-6 max-w-2xl">
@@ -60,13 +48,7 @@ export default function UrlAnalysisPage() {
         </div>
 
         {analyzing ? (
-          <div className="border border-white/10 rounded-2xl bg-slate-900/60 p-12 text-center flex flex-col items-center justify-center space-y-6">
-            <Loader className="h-10 w-10 text-cyan-400 animate-spin" />
-            <div className="space-y-1.5">
-              <h3 className="text-sm font-bold text-slate-200">FactLens Web-Scraper Running</h3>
-              <p className="text-xs text-slate-500 font-mono tracking-tight animate-pulse">{logStep}</p>
-            </div>
-          </div>
+          <PipelineAnimator />
         ) : (
           <form onSubmit={handleRun} className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md space-y-6">
             

@@ -15,7 +15,8 @@ import {
   ListFilter,
   Shield,
   PlusCircle,
-  Network
+  Network,
+  Scale
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -25,6 +26,7 @@ export default function Sidebar() {
   const links = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Analyze Content', href: '/analysis', icon: PlusCircle },
+    { name: 'Compare Articles', href: '/analysis/compare', icon: Scale },
     { name: 'History Logs', href: '/dashboard/history', icon: History },
     { name: 'Saved Bookmarks', href: '/dashboard/bookmarks', icon: Bookmark },
     { name: 'Topic Graph', href: '/knowledge-graph', icon: Network },

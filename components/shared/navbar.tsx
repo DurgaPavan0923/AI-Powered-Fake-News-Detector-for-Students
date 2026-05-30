@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { useNotificationStore } from '@/store/notification.store';
-import { Bell, ShieldAlert, Sparkles, User as UserIcon, LogOut, CheckCircle, GraduationCap, Moon } from 'lucide-react';
+import GlobalSearch from './global-search';
+import { Bell, ShieldAlert, Sparkles, User as UserIcon, LogOut, CheckCircle, GraduationCap, Scale } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout, toggleRole } = useAuthStore();
@@ -31,9 +32,25 @@ export default function Navbar() {
           </span>
         </Link>
 
+        {/* Global Search trigger */}
+        <div className="hidden md:block">
+          <GlobalSearch />
+        </div>
+
         {/* Action Controls */}
         <div className="flex items-center gap-4">
           
+          {/* Compare Shortcut */}
+          {user && (
+            <Link 
+              href="/analysis/compare" 
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 transition-colors"
+            >
+              <Scale className="h-3.5 w-3.5 text-cyan-400" />
+              Compare
+            </Link>
+          )}
+
           {/* Dashboard Quicklink */}
           {user && (
             <Link 
@@ -41,7 +58,7 @@ export default function Navbar() {
               className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 transition-colors border border-white/10"
             >
               <GraduationCap className="h-3.5 w-3.5" />
-              Go to Workspace
+              Workspace
             </Link>
           )}
 
@@ -53,7 +70,7 @@ export default function Navbar() {
               className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 hover:bg-cyan-900/40 transition-all cursor-pointer"
             >
               <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
-              Role: {user.role}
+              {user.role}
             </button>
           )}
 
@@ -87,7 +104,7 @@ export default function Navbar() {
                     <div className="text-center py-6 text-xs text-slate-500">No new notifications.</div>
                   ) : (
                     notifications.map(n => (
-                      <div key={n.id} className={`p-2.5 rounded-lg text-left transition-colors border ${n.read ? 'bg-transparent border-transparent' : 'bg-white/5 border-white/5'}`}>
+                      <div key={n.id} className={`p-2.5 rounded-lg text-left transition-colors border &{n.read ? 'bg-transparent border-transparent' : 'bg-white/5 border-white/5'}`}>
                         <div className="flex items-center justify-between">
                           <span className={`text-xs font-semibold ${n.type === 'alert' ? 'text-rose-400' : 'text-slate-200'}`}>{n.title}</span>
                           <span className="text-[9px] text-slate-500">{n.time}</span>
@@ -126,7 +143,7 @@ export default function Navbar() {
                   <div className="p-1">
                     <Link href="/dashboard/settings" onClick={() => setDropdownOpen(false)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-white/5 transition-all">
                       <UserIcon className="h-4 w-4 text-slate-400" />
-                      Settings & API Keys
+                      Settings
                     </Link>
                     <button 
                       onClick={() => { setDropdownOpen(false); logout(); router.push('/'); }} 

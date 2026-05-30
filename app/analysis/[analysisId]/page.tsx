@@ -1,23 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAnalysisStore } from '@/store/analysis.store';
-import CredibilityScore from '@/components/analysis/credibility-score';
-import FakeNewsMeter from '@/components/analysis/fake-news-meter';
+import CredibilityGauge from '@/components/analysis/credibility-gauge';
+import ExplainableAI from '@/components/analysis/explainable-ai';
+import ChatPanel from '@/components/analysis/chat-panel';
+import StudyMode from '@/components/analysis/study-mode';
 import EvidenceCard from '@/components/analysis/evidence-card';
 import SourceCard from '@/components/analysis/source-card';
 import GraphView from '@/components/graph/graph-view';
 import NodeCard from '@/components/graph/node-card';
+import ReportSharing from '@/components/reports/report-sharing';
 import Breadcrumbs from '@/components/shared/breadcrumbs';
 import { jsPDF } from 'jspdf';
-import { BookOpen, Star, Sparkles, FileText, ChevronRight, Network, Share2, HelpCircle } from 'lucide-react';
+import { BookOpen, Star, FileText, Scale } from 'lucide-react';
 
 export default function AnalysisDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { records, toggleBookmark } = useAnalysisStore();
-  const [activeTab, setActiveTab] = useState<'claims' | 'bias' | 'graph'>('claims');
+  const [activeTab, setActiveTab] = useState<'claims' | 'bias' | 'study' | 'graph'>('claims');
   const [selectedNode, setSelectedNode] = useState<{ label: string; type: string; description: string } | null>(null);
 
   const id = params.analysisId as string;
@@ -25,7 +28,7 @@ export default function AnalysisDetailPage() {
 
   if (!record) {
     return (
-      <div className="text-center py-20 text-slate-400 text-sm font-semibold max-w-md mx-auto">
+      <div className="text-center py-20 text-slate-400 text-xs select-none max-w-md mx-auto">
         Report could not be found. Let's redirect to your workspace.
         <button onClick={() => router.push('/dashboard')} className="mt-4 block w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-colors">
           Return to Dashboard
@@ -34,7 +37,6 @@ export default function AnalysisDetailPage() {
     );
   }
 
-  // jsPDF printable portfolio export
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.setFont('Helvetica', 'normal');
@@ -51,7 +53,6 @@ export default function AnalysisDetailPage() {
     doc.line(14, 45, 196, 45);
 
     doc.setFontSize(14);
-    doc.setTextColor(15, 23, 42);
     doc.text('Credibility Rating Overview', 14, 55);
     
     doc.setFontSize(11);
@@ -84,16 +85,16 @@ export default function AnalysisDetailPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-12">
+    <div className="max-w-7xl mx-auto pb-12 select-none">
       <Breadcrumbs items={[{ name: 'History Logs', href: '/dashboard/history' }, { name: 'Report detail' }]} />
       
       <div className="space-y-8">
         
-        {/* Upper Header segment */}
+        {/* Header Title */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-white/10 pb-6">
           <div className="space-y-1.5 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400 bg-cyan-950/40 border border-cyan-500/20 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400 bg-cyan-950/40 border border-cyan-500/20 px-2 py-0.5 rounded animate-pulse">
                 Verified: {record.trustRating} Trust
               </span>
               <span className="text-[10px] text-slate-500 font-semibold">{record.date}</span>
@@ -118,45 +119,75 @@ export default function AnalysisDetailPage() {
               onClick={exportPDF}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors cursor-pointer"
             >
-              <FileText className="h-4 w-4" /> Download PDF Report
+              <FileText className="h-4 w-4" /> Download PDF
             </button>
           </div>
         </div>
 
-        {/* Scoring Gauges split segment */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <CredibilityScore score={record.credibilityScore} />
-          <div className="md:col-span-2">
-            <FakeNewsMeter probability={record.fakeProbability} />
-          </div>
-        </div>
+        {/* Public Sharing Widget */}
+        <ReportSharing />
 
-        {/* Explainability Synthesis */}
-        <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md space-y-3">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-indigo-400" />
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-300">AI Explanatory Synthesis</h3>
-          </div>
-          <p className="text-xs md:text-sm text-slate-300 leading-relaxed font-semibold">
-            {record.explanation}
-          </p>
-        </div>
-
-        {/* Main Tabbed interactive interface */}
-        <div className="space-y-6">
+        {/* Split grid of Gauges + AI Explanations + Chatbot */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
-          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+          {/* Left Column (Speedometer & Explainable metrics) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <CredibilityGauge score={record.credibilityScore} />
+              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Fake Risk meter</span>
+                  <h2 className="text-2xl font-extrabold text-rose-400 tracking-tight">{record.fakeProbability}% Risk</h2>
+                  <p className="text-xs text-slate-400 leading-normal font-semibold">
+                    The AI indicates a {record.fakeProbability}% probability of emotional manipulation, clickbait wording, or unverified claims.
+                  </p>
+                </div>
+                <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-white/5 mt-4">
+                  <div className="h-full bg-rose-500" style={{ width: `${record.fakeProbability}%` }} />
+                </div>
+              </div>
+            </div>
+
+            <ExplainableAI 
+              score={record.credibilityScore} 
+              confidence={92} 
+              claims={record.claims}
+              sources={record.suggestedSources}
+            />
+          </div>
+
+          {/* Right Column (Ask FactLens Chat chatbot) */}
+          <div>
+            <ChatPanel 
+              articleTitle={record.title} 
+              claims={record.claims} 
+            />
+          </div>
+
+        </div>
+
+        {/* Tabs index */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto">
             <button 
               onClick={() => setActiveTab('claims')}
-              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 cursor-pointer ${
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
                 activeTab === 'claims' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
               }`}
             >
               Verification Claims ({record.claims.length})
             </button>
             <button 
+              onClick={() => setActiveTab('study')}
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
+                activeTab === 'study' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Study Helper
+            </button>
+            <button 
               onClick={() => setActiveTab('bias')}
-              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 cursor-pointer ${
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
                 activeTab === 'bias' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -164,7 +195,7 @@ export default function AnalysisDetailPage() {
             </button>
             <button 
               onClick={() => setActiveTab('graph')}
-              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 cursor-pointer ${
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
                 activeTab === 'graph' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -180,19 +211,22 @@ export default function AnalysisDetailPage() {
                   <EvidenceCard claims={record.claims} />
                 </div>
                 <div className="space-y-6">
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Suggested Consensus Repositories</h4>
-                    <p className="text-[10px] text-slate-500 font-semibold leading-normal">Cross-referenced citation referenceswhitelisted for fact checking.</p>
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Suggested Consensus Libraries</h4>
                   </div>
                   <SourceCard sources={record.suggestedSources} />
                 </div>
               </div>
             )}
 
+            {activeTab === 'study' && (
+              <StudyMode articleTitle={record.title} />
+            )}
+
             {activeTab === 'bias' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {Object.entries(record.bias).filter(([k]) => k !== 'explanation').map(([key, val]) => (
-                  <div key={key} className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 p-5 space-y-3.5">
+                  <div key={key} className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 space-y-3.5">
                     <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
                       <span>{key} index</span>
                       <span className="text-slate-200 font-extrabold">{val as number}%</span>
@@ -203,8 +237,8 @@ export default function AnalysisDetailPage() {
                   </div>
                 ))}
                 
-                <div className="sm:col-span-2 p-6 rounded-2xl border border-white/10 bg-slate-900/60 p-5">
-                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bias Evaluation log</h4>
+                <div className="sm:col-span-2 p-6 rounded-2xl border border-white/10 bg-slate-900/60">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bias Evaluation Analysis</h4>
                   <p className="text-xs text-slate-300 leading-relaxed font-semibold">{record.bias.explanation}</p>
                 </div>
               </div>
