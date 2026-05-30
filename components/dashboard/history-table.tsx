@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAnalysisStore, AnalysisRecord } from '@/store/analysis.store';
-import { BookmarksIcon, FileText, Search, Trash2, ArrowUpRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { FileText, Search, Trash2, ArrowUpRight, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function HistoryTable() {
   const { records, deleteRecord, toggleBookmark } = useAnalysisStore();
