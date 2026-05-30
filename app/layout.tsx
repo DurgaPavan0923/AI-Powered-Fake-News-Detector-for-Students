@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import Navbar from '@/components/shared/navbar';
 import Sidebar from '@/components/shared/sidebar';
 import Footer from '@/components/shared/footer';
+import FactLensCopilot from '@/components/shared/copilot';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -35,6 +36,9 @@ export default function RootLayout({
 
         {/* Footer */}
         <Footer />
+
+        {/* Global Floating Copilot */}
+        <FactLensCopilot />
 
       </body>
     </html>

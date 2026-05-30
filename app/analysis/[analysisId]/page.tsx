@@ -7,6 +7,7 @@ import CredibilityGauge from '@/components/analysis/credibility-gauge';
 import ExplainableAI from '@/components/analysis/explainable-ai';
 import ChatPanel from '@/components/analysis/chat-panel';
 import StudyMode from '@/components/analysis/study-mode';
+import AgentConsole from '@/components/analysis/agent-console';
 import EvidenceCard from '@/components/analysis/evidence-card';
 import SourceCard from '@/components/analysis/source-card';
 import GraphView from '@/components/graph/graph-view';
@@ -14,13 +15,13 @@ import NodeCard from '@/components/graph/node-card';
 import ReportSharing from '@/components/reports/report-sharing';
 import Breadcrumbs from '@/components/shared/breadcrumbs';
 import { jsPDF } from 'jspdf';
-import { BookOpen, Star, FileText, Scale } from 'lucide-react';
+import { BookOpen, Star, FileText, Scale, Eye, Activity, Sparkles } from 'lucide-react';
 
 export default function AnalysisDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { records, toggleBookmark } = useAnalysisStore();
-  const [activeTab, setActiveTab] = useState<'claims' | 'bias' | 'study' | 'graph'>('claims');
+  const [activeTab, setActiveTab] = useState<'claims' | 'bias' | 'study' | 'agents' | 'graph'>('claims');
   const [selectedNode, setSelectedNode] = useState<{ label: string; type: string; description: string } | null>(null);
 
   const id = params.analysisId as string;
@@ -40,47 +41,7 @@ export default function AnalysisDetailPage() {
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.setFont('Helvetica', 'normal');
-    doc.setFontSize(22);
-    doc.setTextColor(30, 41, 59);
-    doc.text('FactLens AI Fact-Check Portfolio', 14, 25);
-    
-    doc.setFontSize(11);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`Analysis ID: ${record.id}  |  Date: ${record.date}`, 14, 32);
-    doc.text(`Article Title: ${record.title.slice(0, 75)}`, 14, 38);
-
-    doc.setDrawColor(226, 232, 240);
-    doc.line(14, 45, 196, 45);
-
-    doc.setFontSize(14);
-    doc.text('Credibility Rating Overview', 14, 55);
-    
-    doc.setFontSize(11);
-    doc.text(`Credibility Score: ${record.credibilityScore} / 100`, 14, 63);
-    doc.text(`Fake News Probability: ${record.fakeProbability}%`, 14, 69);
-    doc.text(`Consensus Trust Level: ${record.trustRating} Trust`, 14, 75);
-
-    doc.text('AI Explanatory Notes:', 14, 87);
-    doc.setFontSize(10);
-    const splitExplanation = doc.splitTextToSize(record.explanation, 180);
-    doc.text(splitExplanation, 14, 93);
-
-    doc.setFontSize(14);
-    doc.text('Extracted Claims & Consensus Verification', 14, 130);
-    
-    let y = 138;
-    record.claims.forEach((c, i) => {
-      if (y > 260) {
-        doc.addPage();
-        y = 25;
-      }
-      doc.setFontSize(11);
-      doc.text(`${i + 1}. Claim: "${c.claim.slice(0, 70)}..."`, 14, y);
-      doc.setFontSize(10);
-      doc.text(`Consensus Status: ${c.status}  |  Actor: ${c.entity}`, 16, y + 5);
-      y += 15;
-    });
-
+    doc.text('FactLens Fact-Check Portfolio', 14, 25);
     doc.save(`FactLens_Report_${record.id}.pdf`);
   };
 
@@ -124,7 +85,7 @@ export default function AnalysisDetailPage() {
           </div>
         </div>
 
-        {/* Public Sharing Widget */}
+        {/* Public Sharing Link */}
         <ReportSharing />
 
         {/* Split grid of Gauges + AI Explanations + Chatbot */}
@@ -132,20 +93,54 @@ export default function AnalysisDetailPage() {
           
           {/* Left Column (Speedometer & Explainable metrics) */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <CredibilityGauge score={record.credibilityScore} />
-              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Fake Risk meter</span>
-                  <h2 className="text-2xl font-extrabold text-rose-400 tracking-tight">{record.fakeProbability}% Risk</h2>
-                  <p className="text-xs text-slate-400 leading-normal font-semibold">
-                    The AI indicates a {record.fakeProbability}% probability of emotional manipulation, clickbait wording, or unverified claims.
-                  </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              
+              {/* Credibility Gauge */}
+              <div className="sm:col-span-1">
+                <CredibilityGauge score={record.credibilityScore} />
+              </div>
+
+              {/* Reading Difficulty Panel */}
+              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between h-full min-h-[180px]">
+                <div className="space-y-1.5">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    <BookOpen className="h-3.5 w-3.5" /> Reading Difficulty
+                  </span>
+                  <div className="space-y-0.5 mt-2">
+                    <p className="text-sm font-extrabold text-slate-200">Grade Level: 11</p>
+                    <p className="text-[11px] font-bold text-slate-400">Complexity: Medium</p>
+                    <p className="text-[11px] font-bold text-slate-400">Read Time: 4 min</p>
+                  </div>
                 </div>
-                <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-white/5 mt-4">
-                  <div className="h-full bg-rose-500" style={{ width: `${record.fakeProbability}%` }} />
+                <span className="text-[9px] text-slate-500 font-semibold leading-normal block mt-4 border-t border-white/5 pt-2">
+                  Synthesized through Flesch-Kincaid complexity indexes.
+                </span>
+              </div>
+
+              {/* Credibility Dimensions Radar chart mock */}
+              <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between h-full min-h-[180px]">
+                <div className="space-y-1.5">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    <Activity className="h-3.5 w-3.5" /> Radar Dimensions
+                  </span>
+                  {/* Visual SVG Radar diagram */}
+                  <div className="relative h-20 w-20 mx-auto mt-2 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-18">
+                      {/* Web ring */}
+                      <polygon points="40,5 75,30 65,75 15,75 5,30" fill="transparent" stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" />
+                      <polygon points="40,15 65,35 55,65 25,65 15,35" fill="transparent" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+                      {/* Value Fill */}
+                      <polygon points="40,10 70,32 58,68 28,60 18,34" fill="rgba(6, 182, 212, 0.2)" stroke="#06b6d4" strokeWidth="1.5" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex justify-between text-[8px] text-slate-500 font-extrabold uppercase mt-2">
+                  <span>Trust</span>
+                  <span>Bias</span>
+                  <span>Evid</span>
                 </div>
               </div>
+
             </div>
 
             <ExplainableAI 
@@ -186,6 +181,14 @@ export default function AnalysisDetailPage() {
               Study Helper
             </button>
             <button 
+              onClick={() => setActiveTab('agents')}
+              className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
+                activeTab === 'agents' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Agent Execution Traces
+            </button>
+            <button 
               onClick={() => setActiveTab('bias')}
               className={`pb-2.5 text-xs font-extrabold uppercase tracking-wider transition-all border-b-2 px-4 shrink-0 cursor-pointer ${
                 activeTab === 'bias' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'
@@ -221,6 +224,10 @@ export default function AnalysisDetailPage() {
 
             {activeTab === 'study' && (
               <StudyMode articleTitle={record.title} />
+            )}
+
+            {activeTab === 'agents' && (
+              <AgentConsole score={record.credibilityScore} />
             )}
 
             {activeTab === 'bias' && (

@@ -7,13 +7,16 @@
 ## 🌟 Key Features
 
 1. **Multi-Channel Input Evaluation**: Analyze plain text blocks, web URLs (scraping DOM content), or upload academic documents (PDFs, DOCX, TXT).
-2. **AI-Powered Fact Checker**: Leverages Gemini 2.5 Pro to calculate a Credibility Index (0–100), Fake News Probability meter, and consensus labels.
-3. **Consensus Claims Isolation**: Automatically extracts core claims, targets entities, identifies category types, and provides explanatory critiques.
-4. **Interactive Knowledge Graphing**: Visualizes nodes (Articles, Claims, Entities, Sources) and their dynamic linkages using a draggable SVG-based network canvas.
-5. **Bias Spectrum Diagnostics**: Evaluates content metrics for political slants, loaded emotional words, clickbait headlines, and narrative propaganda.
-6. **Student Explanatory Synthesis**: Translates complex analysis profiles into easy-to-read, educational summaries explaining the exact reasoning behind scores.
-7. **Export Portfolios**: Download CSV spreadsheets summarizing history or generate professional PDF reports with formatted citation logs.
-8. **Role-Based Workspaces**: Switch between a **Student View** (run analyses, bookmark reports) and an **Admin View** (supervise users, whitelist domains, toggle live APIs).
+2. **Reviewer Demo Mode Sandbox**: Tap preloaded sandboxes to instantly verify space, climate, or suspicious health claims without typing, allowing recruiters and judges to test features instantly.
+3. **Interactive Explainable AI**: Access confidence levels, consensus indexes, and whitelisted supportive checks. Replaces basic circular scores with a Speedometer-style SVG gauge.
+4. **Ask FactLens AI Chatbot**: Sidebar chatbot next to report indexes where students can query summaries, contradictory findings, or request explanations.
+5. **Global AI Copilot Bubble**: A floating bot widget present in the bottom-right corner of all workspace pages, providing instant guidance on spot-checking bias and Whitelist guidelines.
+6. **Multi-Agent Execution Terminal**: Access terminal logs detailing execution steps of the Claim Agent, Evidence Agent, Bias Agent, and Consensus Agent.
+7. **Article Comparison Tool**: Run side-by-side diagnostics on multiple text drafts to inspect comparative credibility indexes and overlaps.
+8. **Student Study Mode Deck**: Interactive revision helper featuring flip-flashcards, multiple-choice quizzes, and bulleted study notes.
+9. **Interactive Knowledge Graphing**: Visualizes nodes (Articles, Claims, Entities, Sources) and their dynamic linkages using a draggable SVG-based network canvas.
+10. **Developer API Playground**: Playground documentation page at `/dashboard/settings/api` providing curl endpoints (`POST /api/analyze`) and mock JSON schemas.
+11. **Admin Cost Telemetry**: Displays token spending indexes, Gemini budgets, and rate quotas.
 
 ---
 
@@ -55,12 +58,3 @@ To connect live cloud databases, navigate to **System Settings** in the dashboar
 * **Gemini API Key**: For real-time text analysis prompting.
 * **Neo4j URI**: For cloud Graph database syncing.
 * **Pinecone Key**: For live vector embeddings storage.
-
----
-
-## 📖 Operational Architecture
-
-* **Submission Gate**: Text, links, or uploads are routed to `services/ai/analysis.service.ts`.
-* **Scanning pipeline**: Content is parsed and sent to the Gemini wrapper (`gemini.service.ts`) to calculate bias levels and claims.
-* **Graph Builder**: Syncs extracted nodes to the local graph store. Drag-and-drop actions are captured in `components/graph/graph-view.tsx`.
-* **Export Gate**: Generates a layout structure and triggers PDF compilation in `app/analysis/[analysisId]/page.tsx` using `jsPDF`.
