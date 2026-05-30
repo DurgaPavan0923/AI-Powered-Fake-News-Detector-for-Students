@@ -2,6 +2,8 @@
 
 **FactLens AI** is an AI-powered media literacy and fact-checking workspace built specifically for students, educators, and academic researchers. It analyzes digital articles, PDFs, uploaded essays, and links to evaluate content credibility, extract target claims, analyze bias categories, and cross-reference assertions against whitelisted consensus databases.
 
+🚀 **Live Vercel Deployment**: [https://ai-powered-fake-news-detector-for-s.vercel.app/](https://ai-powered-fake-news-detector-for-s.vercel.app/)
+
 ---
 
 ## 🌟 Key Features
