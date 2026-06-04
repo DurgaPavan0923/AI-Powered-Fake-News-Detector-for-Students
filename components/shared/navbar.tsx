@@ -40,7 +40,7 @@ export default function Navbar() {
           <div className="rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-500 p-2 shadow-md shadow-violet-500/20 group-hover:scale-105 transition-transform duration-300">
             <ShieldAlert className="h-5 w-5 text-white" />
           </div>
-          <span className="bg-gradient-to-r from-cyan-400 via-indigo-200 to-violet-400 bg-clip-text text-xl font-bold tracking-tight text-transparent">
+          <span className="bg-gradient-to-r from-cyan-400 via-indigo-200 to-violet-400 bg-clip-text text-xl font-bold tracking-tight text-transparent whitespace-nowrap">
             FactLens <span className="text-cyan-400">AI</span>
           </span>
         </Link>
@@ -57,7 +57,7 @@ export default function Navbar() {
           {user && (
             <Link 
               href="/analysis/compare" 
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 transition-colors"
             >
               <Scale className="h-3.5 w-3.5 text-cyan-400" />
               Compare
@@ -80,7 +80,7 @@ export default function Navbar() {
             <button
               onClick={toggleRole}
               title="Toggle Student vs Admin View"
-              className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 hover:bg-cyan-900/40 transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 hover:bg-cyan-900/40 transition-all cursor-pointer"
             >
               <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
               {user.role}
@@ -154,6 +154,14 @@ export default function Navbar() {
                     <p className="text-[10px] text-slate-500 mt-0.5 truncate">{user.email}</p>
                   </div>
                   <div className="p-1">
+                    {/* Mobile-only role switcher */}
+                    <button 
+                      onClick={() => { toggleRole(); setDropdownOpen(false); }}
+                      className="flex sm:hidden w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-cyan-300 hover:bg-white/5 transition-all text-left font-bold cursor-pointer"
+                    >
+                      <Sparkles className="h-4 w-4 text-cyan-400 animate-pulse" />
+                      Switch Role ({user.role === 'Student' ? 'Admin' : 'Student'})
+                    </button>
                     <Link href="/dashboard/settings" onClick={() => setDropdownOpen(false)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-white/5 transition-all">
                       <UserIcon className="h-4 w-4 text-slate-400" />
                       Settings
