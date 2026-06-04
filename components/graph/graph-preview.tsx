@@ -54,7 +54,7 @@ export default function GraphPreview() {
         onMouseUp={() => setDraggedId(null)}
         onMouseLeave={() => setDraggedId(null)}
       >
-        <svg className="w-full h-full">
+        <svg viewBox="0 0 300 176" className="w-full h-full">
           {/* Render lines */}
           <line x1={nodes[0].x} y1={nodes[0].y} x2={nodes[1].x} y2={nodes[1].y} stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" />
           <line x1={nodes[0].x} y1={nodes[0].y} x2={nodes[2].x} y2={nodes[2].y} stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" />

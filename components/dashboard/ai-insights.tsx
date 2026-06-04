@@ -16,7 +16,7 @@ export default function AIInsights() {
           <p className="text-xs text-slate-400 leading-relaxed font-semibold">
             Your recent workspace checks show highly credible findings in **Science** (82% avg credibility). However, **Health-related** queries exhibit the highest misinformation rates this week, with 2 suspicious sources flagged.
           </p>
-          <div className="text-[10px] font-bold text-cyan-400 flex items-center gap-1.5 bg-cyan-950/40 border border-cyan-500/15 px-3 py-1.5 rounded-lg w-max">
+          <div className="text-[10px] font-bold text-cyan-400 flex items-center gap-1.5 bg-cyan-950/40 border border-cyan-500/15 px-3 py-1.5 rounded-lg w-fit max-w-full">
             💡 Recommended: Cross-reference health claims against American Diabetes Whitelists.
           </div>
         </div>

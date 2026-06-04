@@ -102,7 +102,7 @@ export default function Navbar() {
             </button>
 
             {notiOpen && (
-              <div className="absolute right-0 mt-3 w-80 rounded-xl border border-white/10 bg-slate-900 shadow-2xl p-4 z-50">
+              <div className="fixed inset-x-4 top-16 md:absolute md:right-0 md:left-auto md:w-80 md:inset-x-auto mt-3 rounded-xl border border-white/10 bg-slate-900 shadow-2xl p-4 z-50">
                 <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
                   <span className="text-xs font-bold text-slate-200">Alert Center</span>
                   <button 

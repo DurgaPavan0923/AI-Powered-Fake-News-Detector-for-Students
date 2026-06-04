@@ -197,7 +197,8 @@ export default function GraphView({ articleTitle = 'Primary Document', claims = 
       {/* SVG Canvas drawing nodes and links */}
       <svg 
         ref={containerRef}
-        className="w-full h-[450px] cursor-grab active:cursor-grabbing select-none"
+        viewBox="0 0 800 450"
+        className="w-full h-auto max-h-[450px] cursor-grab active:cursor-grabbing select-none"
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}

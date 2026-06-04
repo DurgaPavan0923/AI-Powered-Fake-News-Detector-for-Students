@@ -58,7 +58,7 @@ export default function EvidenceExplorer({ sources }: EvidenceExplorerProps) {
 
       {/* Table view */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
+        <table className="w-full text-left text-xs border-collapse min-w-[600px]">
           <thead>
             <tr className="border-b border-white/5 text-slate-500 text-[10px] uppercase font-bold tracking-wider">
               <th className="py-2.5 px-3">Evidence Source</th>
