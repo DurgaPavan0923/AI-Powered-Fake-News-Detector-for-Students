@@ -1,62 +1,135 @@
-# FactLens AI 🔍 — Educational Fact-Verification Platform
+# 🔍 FactLens AI — Educational Fact-Verification & Media Literacy Platform
 
-**FactLens AI** is an AI-powered media literacy and fact-checking workspace built specifically for students, educators, and academic researchers. It analyzes digital articles, PDFs, uploaded essays, and links to evaluate content credibility, extract target claims, analyze bias categories, and cross-reference assertions against whitelisted consensus databases.
+> A premium, recruiter-grade media literacy and fact-checking workspace built specifically for students, educators, and academic researchers.  
+> Evaluate digital articles, PDFs, uploaded essays, and links to evaluate content credibility, extract target claims, analyze bias categories, and cross-reference assertions against whitelisted consensus databases.
 
-🚀 **Live Vercel Deployment**: [https://ai-powered-fake-news-detector-for-s.vercel.app/](https://ai-powered-fake-news-detector-for-s.vercel.app/)
-
----
-
-## 🌟 Key Features
-
-1. **Multi-Channel Input Evaluation**: Analyze plain text blocks, web URLs (scraping DOM content), or upload academic documents (PDFs, DOCX, TXT).
-2. **Reviewer Demo Mode Sandbox**: Tap preloaded sandboxes to instantly verify space, climate, or suspicious health claims without typing, allowing recruiters and judges to test features instantly.
-3. **Interactive Explainable AI**: Access confidence levels, consensus indexes, and whitelisted supportive checks. Replaces basic circular scores with a Speedometer-style SVG gauge.
-4. **Ask FactLens AI Chatbot**: Sidebar chatbot next to report indexes where students can query summaries, contradictory findings, or request explanations.
-5. **Global AI Copilot Bubble**: A floating bot widget present in the bottom-right corner of all workspace pages, providing instant guidance on spot-checking bias and Whitelist guidelines.
-6. **Multi-Agent Execution Terminal**: Access terminal logs detailing execution steps of the Claim Agent, Evidence Agent, Bias Agent, and Consensus Agent.
-7. **Article Comparison Tool**: Run side-by-side diagnostics on multiple text drafts to inspect comparative credibility indexes and overlaps.
-8. **Student Study Mode Deck**: Interactive revision helper featuring flip-flashcards, multiple-choice quizzes, and bulleted study notes.
-9. **Interactive Knowledge Graphing**: Visualizes nodes (Articles, Claims, Entities, Sources) and their dynamic linkages using a draggable SVG-based network canvas.
-10. **Developer API Playground**: Playground documentation page at `/dashboard/settings/api` providing curl endpoints (`POST /api/analyze`) and mock JSON schemas.
-11. **Admin Cost Telemetry**: Displays token spending indexes, Gemini budgets, and rate quotas.
+**Live Deployment URL:** [https://ai-powered-fake-news-detector-for-s.vercel.app/](https://ai-powered-fake-news-detector-for-s.vercel.app/)
 
 ---
 
-## 🛠️ Technology Stack
+## 🎨 Latest UI/UX, Adaptive Navigation, & Authentication Upgrades
 
-* **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS (v4), Framer Motion, Recharts, Zustand, Lucide React
-* **AI & NLP**: Gemini 2.5 Pro (`@google/generative-ai`)
-* **Vector DB**: Pinecone (Fallback to local simulated embeddings index)
-* **Graph DB**: Neo4j AuraDB (Fallback to local localStorage-persisted node-link stores)
-* **Exporting**: jsPDF
+We have upgraded the platform to enterprise-grade SaaS standards, resolving visual polish, navigation layout quality, role-based authentication, and mobile responsiveness:
+
+* **Dual-Role Authentication Gateway** (`/login`): A styled selection portal separating the **Student Portal** (🎓 Analyze & Learn) and the **Admin Portal** (🛡 Manage Platform). Includes path guarding in `middleware.ts` for role-locked paths (`/dashboard` for students, `/admin` for admins).
+* **Zustand & Cookie Session Synchronization**: Client session store automatically syncs active user credentials to `factlens_user_session` edge-readable cookies, resolving unauthorized redirect loops.
+* **Perplexity-Style Evidence Explorer**: An interactive source tracking table displaying name, publication date, reliability percentage indicator, and semantic match strength.
+* **Research Citation Exporter**: Academic exporter tab containing a synthesized report abstract alongside copyable citations formatted in APA, MLA, Chicago, and BibTeX styles.
+* **Mobile Screen Auto-Adaptability**:
+  - *Responsive Sidebar Drawer*: Responsive sidebar collapses into a slide-over mobile drawer with translucent backdrops, close tags, and auto-dismissals on route change.
+  - *Mobile Header optimization*: Hides top Compare shortcuts and role toggle badges on small mobile widths to fit the "FactLens AI" logo on a single line.
+  - *Grid Layout adjustments*: Repositioned fixed overlays (e.g. notifications alert card) to stretch responsive parameters on mobile screens without horizontal scroll overflows.
 
 ---
 
-## 🚀 Getting Started
+## ✨ Workspace & Fact-Checking Features
 
-### 1. Prerequisites
-Ensure you have **Node.js v24.x** and **npm v11.x** (or newer) installed.
+| Feature | Description |
+|---|---|
+| 🤖 **Global AI Copilot** | Floating assistant bubble in the layout shell, letting students query whitelists, spot bias, and get citation format rules from anywhere. |
+| 🛡️ **Interactive Speedometer** | Speedometer-style SVG gauge replacing raw percentages to deliver clear, intuitive visual trust, risk, and confidence ratings. |
+| 📄 **Explainable AI Panel** | Detailed RAG consensus breakdown explaining exactly *why* a credibility rating was assigned, detailing corroborated reference checks and factual contradictions. |
+| 🗺️ **Knowledge Graph Explorer** | Beautiful SVG-based interactive dependency network canvas visualizing relationships between Articles, Claims, Entities, and Sources. |
+| 🆚 **Split Screen Compare** | Run side-by-side diagnostics on multiple text drafts to inspect comparative credibility indexes and content overlaps. |
+| ⏳ **Multi-Agent Console** | Loading interface and terminal console detailing execution steps of the `ClaimAgent`, `EvidenceAgent`, `BiasAgent`, and `ConsensusAgent`. |
+| 📚 **Student Study Mode** | Interactive revision helper featuring flip-flashcards, multiple-choice quizzes, and bulleted study notes. |
+| 📊 **AI Cost Telemetry** | Displays token spending indexes, Gemini budgets, and active rate quotas in the Admin Analytics panels. |
+| 🛡️ **WAF BotID Guard** | Developer API references detailing `/api/analyze` and `/api/verify` along with Vercel BotID rate-limiting guidelines. |
 
-### 2. Installation
-Install the project dependencies in the project root directory:
+---
+
+## 🗂️ Project Structure
+
+```
+AI-Powered-Fake-News-Detector/
+│
+├── app/
+│   ├── (marketing)/        # Landing page, pricing, features, privacy, contact
+│   ├── admin/              # Admin tools (users, sources, telemetry, feature-flags)
+│   ├── analysis/           # Input evaluation portals (text, upload, url, compare, detail [id])
+│   ├── auth/               # Split authentication routes (student, admin login gates)
+│   ├── dashboard/          # Student workspace pages (history logs, bookmarks, api settings)
+│   ├── login/              # Portal selection gateway page
+│   ├── globals.css         # Tailwind v4 globals stylesheet
+│   └── layout.tsx          # Root workspace layout shell
+│
+├── components/
+│   ├── analysis/           # Analysis modules (Speedometer, Evidence Explorer, Research Mode, Study deck)
+│   ├── dashboard/          # Dashboard components (Analytics charts, Cost telemetry, API playground)
+│   ├── graph/              # Draggable SVG Knowledge network elements
+│   ├── shared/             # Shell shared layouts (Sidebar drawer, responsive Navbar, AI Copilot bubble)
+│   └── ui/                 # Reusable primitive visual components
+│
+├── store/
+│   ├── analysis.store.ts   # Zustand evaluation record history store
+│   ├── auth.store.ts       # Zustand auth credentials store synced to cookies
+│   └── ui.store.ts         # Zustand UI state store managing responsive sidebars
+│
+├── middleware.ts           # Next.js Edge route guard protecting roles
+├── next.config.ts          # Compilation configurations skipping lint errors
+└── tsconfig.json           # Strict TypeScript configuration
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/DurgaPavan0923/AI-Powered-Fake-News-Detector.git
+cd AI-Powered-Fake-News-Detector
+```
+
+### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
-### 3. Running Locally
-Launch the Next.js development server:
+### 3. Run the Development Server
+
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser to inspect the application.
+
+### 4. Build and Verify Production Bundle
+
+```bash
+npm run build
+```
 
 ---
 
-## 🔒 Configuration & API Keys
+## ⚙️ Configuration & simulated databases fallback
 
-FactLens AI is built with an **API Connectivity Toggle Engine**. If external cloud credentials are not supplied, the platform falls back to a **high-fidelity local simulation mode**, meaning it remains fully navigable and interactive out-of-the-box.
+FactLens AI includes an **API connectivity toggle mechanism**. If external API credentials are not provided, the platform automatically falls back to **simulated local databases** (persisted in client-side storage), meaning the application is fully interactive out-of-the-box.
 
-To connect live cloud databases, navigate to **System Settings** in the dashboard and provide:
-* **Gemini API Key**: For real-time text analysis prompting.
+To connect production cloud environments, navigate to **System Settings** in the dashboard and configure:
+* **Gemini API Key**: For real-time analysis generation.
 * **Neo4j URI**: For cloud Graph database syncing.
 * **Pinecone Key**: For live vector embeddings storage.
+
+---
+
+## 🔌 REST API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/analyze` | Evaluate digital documents or article text blocks and return credibility scores, claims, and bias matrices. |
+| `POST` | `/api/verify` | Cross-examine a single fact assertion statement against whitelisted consensus databases, returning contradictions. |
+
+---
+
+## 🛠️ Tech Stack
+
+* **Core** — Next.js 15 (App Router), React 19, TypeScript, Zustand.
+* **Styling & Animations** — Tailwind CSS v4, Framer Motion, Lucide React.
+* **AI NLP** — Google Gemini API (`@google/generative-ai`).
+* **Visual Data** — Recharts, jsPDF.
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
